@@ -14,22 +14,27 @@ const signToken = (payload, expiresIn) => {
 
 const authController = {
   register: async (req, res) => {
-    const { username, first_name, last_name, email, password } = req.body;
+    const { username, password } = req.body;
 
     try {
-      // todo: check if email and username exist
+      const user = await User.findOne({ username });
+      if (user) {
+        res.status(400).json({
+          success: false,
+          message: "Username exists",
+        });
+
+        return;
+      }
 
       const password_hash = await bcrypt.hash(password, 10);
 
       const doc = await User.create({
         username,
-        first_name,
-        last_name,
-        email,
         password_hash,
       });
 
-      const token = signToken({ id: doc._id, username, email }, "1h");
+      const token = signToken({ id: doc._id, username }, "1h");
       const rawJWT = jwt.decode(token);
 
       res.status(201).json({
@@ -48,7 +53,6 @@ const authController = {
 
   login: async (req, res) => {
     const { username, password } = req.body;
-    console.log(req.body);
 
     try {
       const user = await User.findOne({ username });
@@ -61,12 +65,11 @@ const authController = {
 
         if (authenticated) {
           const token = signToken(
-            { id: user._id, username: user.username, email: user.email },
+            { id: user._id, username: user.username },
             "1h"
           );
-          console.log(token);
+
           const rawJWT = jwt.decode(token);
-          console.log(rawJWT);
 
           res.status(200).json({
             success: true,
@@ -84,7 +87,6 @@ const authController = {
         message: "Invalid username or password",
       });
     } catch (err) {
-      console.log(err.message);
       res.status(500).json({
         success: false,
         message: "Error logging user in",

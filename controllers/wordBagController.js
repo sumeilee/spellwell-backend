@@ -80,7 +80,6 @@ const wordBagController = {
 
   getWordBags: async (req, res) => {
     const { owner } = req.query;
-    console.log(owner);
     try {
       let data;
 
@@ -98,6 +97,33 @@ const wordBagController = {
       res.status(500).json({
         success: false,
         message: "Error getting word bags",
+      });
+    }
+  },
+
+  unlinkWordBag: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const doc = await WordBag.findOne({ _id: id });
+
+      if (doc) {
+        doc.owner = null;
+        await doc.save();
+
+        res.status(200).json({
+          success: true,
+          message: "Word bag successfully deleted from user's list",
+        });
+      } else {
+        res.status(404).json({
+          success: false,
+          message: "No word bag of that id found",
+        });
+      }
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: "Error deleting word bag from user's list",
       });
     }
   },

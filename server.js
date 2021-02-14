@@ -29,11 +29,12 @@ app.post("/api/v1/login", authController.login);
 
 app.get("/api/v1/wordbags", wordBagController.getWordBags);
 app.get("/api/v1/wordbags/:id", wordBagController.getWordBag);
-app.patch("/api/v1/wordbags/:id/edit", wordBagController.updateWordBag);
+app.patch("/api/v1/wordbags/:id", wordBagController.updateWordBag);
 app.delete("/api/v1/wordbags/:id", wordBagController.deleteWordBag);
 app.post("/api/v1/wordbags/new", wordBagController.createWordBag);
 
 app.get("/api/v1/practices", practiceController.getPractices);
+app.delete("/api/v1/practices/:id", practiceController.deletePractice);
 app.post("/api/v1/practices/new", practiceController.createPractice);
 
 /* CONNECT TO DATABASE AND SERVER */

@@ -10,19 +10,20 @@ const practiceSchema = new mongoose.Schema({
     type: [Object],
     required: true,
   },
-  consecutive_correct: {
-    type: Number,
-    required: true,
-  },
   created_at: {
     type: Date,
     required: true,
+    default: Date.now,
+  },
+  updated_date: {
+    type: Date,
     default: Date.now,
   },
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
   },
+  results: Object,
 });
 
 const Practice = mongoose.model("Practice", practiceSchema);
