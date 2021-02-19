@@ -4,12 +4,15 @@ const cors = require("cors");
 const express = require("express");
 const mongoose = require("mongoose");
 
+const Word = require("./models/Word");
+
 const app = express();
 const port = process.env.PORT || 5000;
 
 const authController = require("./controllers/authController");
 const wordBagController = require("./controllers/wordBagController");
 const practiceController = require("./controllers/practiceController");
+const wordController = require("./controllers/wordController");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -32,6 +35,8 @@ app.get("/api/v1/wordbags/:id", wordBagController.getWordBag);
 app.patch("/api/v1/wordbags/:id", wordBagController.updateWordBag);
 app.delete("/api/v1/wordbags/:id", wordBagController.deleteWordBag);
 app.post("/api/v1/wordbags/new", wordBagController.createWordBag);
+
+app.get("/api/v1/words", wordController.getAllWordSpeech);
 
 app.get("/api/v1/practices", practiceController.getPractices);
 app.delete("/api/v1/practices/:id", practiceController.deletePractice);
