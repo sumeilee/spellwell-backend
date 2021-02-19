@@ -1,27 +1,11 @@
-const speechApi = require("../services/text-to-speech");
-
 const WordBag = require("../models/WordBag");
-const Word = require("../models/Word");
 
 const wordBagController = {
   createWordBag: async (req, res) => {
     const { title, words, consecutive_correct, identifier, owner } = req.body;
 
     try {
-      let docs = await Word.find({ word: { $in: words } });
-
-      if (docs.length !== words.length) {
-        const addWords = words.filter(
-          (word) => !docs.map((doc) => doc.word).includes(word)
-        );
-        console.log(addWords);
-
-        await speechApi.getAllWordSpeech(addWords);
-
-        docs = await Word.find({ word: { $in: words } });
-      }
-
-      const wordBag = await WordBag.create({
+      const data = await WordBag.create({
         title,
         words,
         consecutive_correct,
@@ -29,20 +13,11 @@ const wordBagController = {
         owner,
       });
 
-      const data = {
-        ...wordBag,
-        audio: docs.map((doc) => ({
-          word: doc.word,
-          audioData: doc.audioData,
-        })),
-      };
-
       res.status(201).json({
         success: true,
         data,
       });
     } catch (err) {
-      console.log(err.message);
       res.status(500).json({
         success: false,
         message: "Error creating word bag",
@@ -52,7 +27,7 @@ const wordBagController = {
 
   updateWordBag: async (req, res) => {
     const { id } = req.params;
-    const { words } = req.body;
+    const { title, consecutive_correct, words } = req.body;
 
     try {
       const doc = await WordBag.findOne({ _id: id });
@@ -63,19 +38,6 @@ const wordBagController = {
           message: "WordBag not found",
         });
         return;
-      }
-
-      if (words) {
-        let docs = await Word.find({ word: { $in: words } });
-
-        if (docs.length !== words.length) {
-          const addWords = words.filter(
-            (word) => !docs.map((doc) => doc.word).includes(word)
-          );
-          console.log(addWords);
-
-          await speechApi.getAllWordSpeech(addWords);
-        }
       }
 
       Object.keys(req.body).forEach((key) => {
@@ -91,7 +53,6 @@ const wordBagController = {
         update_at: Date.now(),
       });
     } catch (err) {
-      console.log(err.message);
       res.status(500).json({
         success: false,
         message: "Error updating word bag",
@@ -160,7 +121,6 @@ const wordBagController = {
         });
       }
     } catch (err) {
-      console.log(err.message);
       res.status(500).json({
         success: false,
         message: "Error deleting word bag from user's list",
